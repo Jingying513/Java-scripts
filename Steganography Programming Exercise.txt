@@ -1,0 +1,88 @@
+// write your code here
+var start = new SimpleImage("hilton.jpg");
+print("width, height = "+start.getWidth()+","+start.getHeight());
+
+var hide = new SimpleImage("duvall.jpg");
+print("width, height = "+hide.getWidth()+","+hide.getHeight());
+
+var width = start.getWidth();
+var height = start.getHeight();
+if (hide.getWidth() < width) {
+     width = hide.getWidth();
+}
+if (hide.getHeight() < height) {
+     height = hide.getHeight();
+}
+start = crop(start,width, height);
+hide = crop(hide,width, height);
+
+function crop(image,width,height){
+    var croppedImg = new SimpleImage(width,height);
+    for (var pixel of image.values()){
+        var x = pixel.getX();
+        var y = pixel.getY();
+        if (x < width && y < height) {
+           var updatedPixel = croppedImg.getPixel(x,y);
+           updatedPixel.setRed(pixel.getRed());
+           updatedPixel.setBlue(pixel.getBlue());
+           updatedPixel.setGreen(pixel.getGreen()); 
+        }
+    }
+    return croppedImg;
+}
+print(start);
+print(hide);
+
+function pixchange(colorval){
+    var x = Math.floor(colorval/16) * 16;
+    return x;
+}
+
+function chop2Hide(image){
+    for (var px of image.values()){
+        px.setRed(pixchange(px.getRed()));
+        px.setGreen(pixchange(px.getGreen()));
+        px.setBlue(pixchange(px.getBlue()));
+    }
+    return image;
+}
+
+function shift(image){
+    for (var px of image.values()){
+        px.setRed(Math.floor(px.getRed()/16));
+        px.setGreen(Math.floor(px.getGreen()/16));
+        px.setBlue(Math.floor(px.getBlue()/16));
+    }
+    return image;
+}
+
+var pixel = start.getPixel(50,60); 
+print(pixel.getRed()+", "+pixel.getGreen()+", "+pixel.getBlue());
+var choppedP = chop2Hide(start);
+print(pixel.getRed()+", "+pixel.getGreen()+", "+pixel.getBlue());
+
+function newpv(p,q){
+    if (p+q <= 255){
+        return p+q;
+    }
+    else{
+        print("error:RGB value cannot be greater than 255");
+    }
+}
+
+start = chop2Hide(start);
+hide = shift(hide);
+function combine(img1,img2){
+    var combinedImg = new SimpleImage(width,height);
+    for (var px of combinedImg.values()){
+        var px1 = img1.getPixel(px.getX(),px.getY());
+        var px2 = img2.getPixel(px.getX(),px.getY());
+        px.setRed(newpv(px1.getRed(),px2.getRed()));
+        px.setBlue(newpv(px1.getBlue(),px2.getBlue()));
+        px.setGreen(newpv(px1.getGreen(),px2.getGreen()));
+    }
+    return combinedImg;
+}
+print(start);
+print(hide);
+print(combine(start,hide));
